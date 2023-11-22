@@ -1,0 +1,4 @@
+Juan Pérez,30,Calle 123,Ciudad A,12345,1,2,Colonia A,555-1234,juan@example.com,www.juan.com
+María López,25,Calle 456,Ciudad B,54321,3,,Colonia B,555-5678,maria@example.com,www.maria.com
+Carlos Gómez,40,Calle 789,Ciudad C,67890,4,5,Colonia C,555-9876,carlos@example.com,www.carlos.com
+Luis,22,Metepec,metepec,50180,220,A,MAMAM,1234567890,MDNDND,1SMKNSIS

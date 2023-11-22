@@ -1,0 +1,21 @@
+# Ignorar el directorio del entorno virtual
+venvWinterIsComing/
+winterIsComing/
+winterIsCuming/
+winterIsComing_jdfr/
+winterIsComingjdfr/
+
+# Archivos de bytecode compilados de Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Carpetas que contiene archivos de estado de tu editor/IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Carpetas que contienen archivos de registro, como los de SQLite
+*.log
+*.sqlite3
