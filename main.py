@@ -1,91 +1,102 @@
-from agenda import Agenda, Contacto
+#main.py
+from firestore_db import Agenda, Contacto
+from users import enviar_invitacion, aceptar_invitacion, Usuario, login_user
 
-def cargar_contactos(agenda):
-    try:
-        with open("contactos.txt", "r") as archivo:
-            lineas = archivo.readlines()
-            for linea in lineas:
-                datos = linea.strip().split(',')
-                nombre, edad, calle, ciudad, codigo_postal, numero_exterior, numero_interior, colonia, numero, email, pagina_web = datos
-                contacto = Contacto(nombre, edad, calle, ciudad, codigo_postal, numero_exterior, numero_interior,
-                                    colonia, numero, email, pagina_web)
-                agenda.agregar_contacto(contacto)
-        print("Contactos cargados exitosamente.")
-    except FileNotFoundError:
-        print("El archivo de contactos no existe. No se pudo cargar ningún contacto.")
+current_user = Usuario(user_id='id_del_usuario_actual', email='email_del_usuario_actual')
 
+# Esta función ya no es necesaria porque no leeremos contactos de un archivo de texto.
+# def cargar_contactos(agenda):
+#     ...
 
+# Reemplazamos la función 'guardar_contacto' para que guarde en Firestore
 def guardar_contacto(agenda, contacto):
-    agenda.agregar_contacto(contacto)
-    with open("contactos.txt", "a") as archivo:
-        linea = f"{contacto.get_nombre()},{contacto.get_edad()},{contacto.get_calle()},{contacto.get_ciudad()},{contacto.get_codigo_postal()},{contacto.get_numero_exterior()},{contacto.get_numero_interior()},{contacto.get_colonia()},{contacto.get_numero()},{contacto.get_email()},{contacto.get_pagina_web()}\n"
-        archivo.write(linea)
-        print(f"Contacto '{contacto.get_nombre()}' guardado exitosamente.")
-
+    try:
+        agenda.agregar_contacto(contacto)
+        print(f"Contacto '{contacto.nombre}' guardado exitosamente.")
+    except Exception as e:
+        print(f"Ocurrió un error al guardar el contacto: {e}")
 
 def mostrar_agenda(agenda):
     print("Contactos en la agenda:")
     for contacto in agenda.obtener_contactos():
-        print(f"Nombre: {contacto.get_nombre()}")
-        print(f"Calle: {contacto.get_calle()}")
-        print(f"Ciudad: {contacto.get_ciudad()}")
-        print(f"Código Postal: {contacto.get_codigo_postal()}")
-        print(f"Número Exterior: {contacto.get_numero_exterior()}")
-        print(f"Número Interior: {contacto.get_numero_interior()}")
-        print(f"Colonia: {contacto.get_colonia()}")
-        print(f"Número de Teléfono: {contacto.get_numero()}")
-        print(f"Correo Electrónico: {contacto.get_email()}")
-        print(f"Página Web: {contacto.get_pagina_web()}")
-        print("")
+        print(f"Nombre: {contacto.nombre}")
+        print(f"Edad: {contacto.edad}")
+        print(f"Calle: {contacto.calle}")
+        print(f"Ciudad: {contacto.ciudad}")
+        print(f"Código Postal: {contacto.codigo_postal}")
+        print(f"Número Exterior: {contacto.numero_exterior}")
+        print(f"Número Interior: {contacto.numero_interior}")
+        print(f"Colonia: {contacto.colonia}")
+        print(f"Número de Teléfono: {contacto.numero}")
+        print(f"Correo Electrónico: {contacto.email}")
+        print(f"Página Web: {contacto.pagina_web}")
+        print("") 
 
-def buscar_contacto_por_nombre(agenda, nombre):
-    for contacto in agenda.obtener_contactos():
-        if contacto.get_nombre().lower() == nombre.lower():
-            return contacto
-    return None
+def mostrar_informacion_contacto(contacto):
+    print(f"Nombre: {contacto.nombre}")
+    print(f"Edad: {contacto.edad}")
+    print(f"Calle: {contacto.calle}")
+    print(f"Ciudad: {contacto.ciudad}")
+    print(f"Código Postal: {contacto.codigo_postal}")
+    print(f"Número Exterior: {contacto.numero_exterior}")
+    print(f"Número Interior: {contacto.numero_interior}")
+    print(f"Colonia: {contacto.colonia}")
+    print(f"Número de Teléfono: {contacto.numero}")
+    print(f"Correo Electrónico: {contacto.email}")
+    print(f"Página Web: {contacto.pagina_web}")
+    print("")
 
-def buscar_contacto_por_telefono(agenda, numero):
-    for contacto in agenda.obtener_contactos():
-        if contacto.get_numero() == numero:
-            return contacto
-    return None
 
+# def buscar_contacto_por_nombre(agenda, nombre):
+#     # Esta función se puede mejorar usando las consultas de Firestore directamente
+#     # Pero por ahora, la mantendremos simple y haremos la búsqueda en la lista cargada
+#     for contacto in agenda.obtener_contactos():
+#         if contacto.nombre.lower() == nombre.lower():
+#             return contacto
+#     return None
+
+# Actualizamos la función 'borrar_contacto' para que trabaje con Firestore
 def borrar_contacto(agenda, contacto):
-    if contacto in agenda.obtener_contactos():
-        agenda.obtener_contactos().remove(contacto)
-        with open("contactos.txt", "w") as archivo:
-            for c in agenda.obtener_contactos():
-                linea = f"{c.get_nombre()},{c.get_edad()},{c.get_calle()},{c.get_ciudad()},{c.get_codigo_postal()},{c.get_numero_exterior()},{c.get_numero_interior()},{c.get_colonia()},{c.get_numero()},{c.get_email()},{c.get_pagina_web()}\n"
-                archivo.write(linea)
-        print(f"Contacto '{contacto.get_nombre()}' ha sido borrado.")
+    # Necesitaríamos un método en la clase Agenda para manejar esto en Firestore
+    agenda.eliminar_contacto(contacto)
+    print(f"Contacto '{contacto.nombre}' ha sido borrado.")
 
-def verificar_archivo_contactos():
-    try:
-        with open("contactos.txt", "r"):
-            pass
-    except FileNotFoundError:
-        with open("contactos.txt", "w"):
-            pass
+def main():
+    current_user_id, current_user_email = None, None
+    mi_agenda = Agenda(owner_id=current_user_id)
+    mi_agenda.cargar_contactos()
+    current_user_id, current_user_email = None, None
 
-if __name__ == "__main__":
-    verificar_archivo_contactos()
-    mi_agenda = Agenda()
-    cargar_contactos(mi_agenda)
-
+    
     while True:
+        if not current_user_id:
+            # El usuario necesita iniciar sesión
+            email = input("Por favor ingrese su email: ")
+            password = input("Por favor ingrese su contraseña: ")
+            current_user_id, current_user_email = login_user(email, password)
+            if current_user_id:
+                print(f"Bienvenido {current_user_email}")
+            else:
+                print("Inicio de sesión fallido, intente de nuevo.")
+                continue
+        print("")
         print("1. Crear nuevo contacto")
         print("2. Mostrar Agenda")
         print("3. Buscar contacto por nombre")
         print("4. Buscar contacto por teléfono")
         print("5. Borrar contacto")
-        print("6. Salir")
+        print("6. Compartir mi agenda")
+        print("7. Responder a una invitación")
+        print("8. Salir")
+        print("")
 
         opcion = input("Seleccione una opción: ")
+        print("")
 
         if opcion == "1":
             print("Ingrese los datos del nuevo contacto:")
             nombre = input("Nombre: ")
-            edad = input("Edad: ")
+            edad = int(input("Edad: "))  # Asegúrate de convertir la entrada a int
             calle = input("Calle: ")
             ciudad = input("Ciudad: ")
             codigo_postal = input("Código Postal: ")
@@ -96,38 +107,63 @@ if __name__ == "__main__":
             email = input("Correo Electrónico: ")
             pagina_web = input("Página Web: ")
 
-            contacto = Contacto(nombre, edad, calle, ciudad, codigo_postal, numero_exterior, numero_interior, colonia,
-                                numero, email, pagina_web)
-            guardar_contacto(mi_agenda, contacto)
+            nuevo_contacto = Contacto(nombre, edad, calle, ciudad, codigo_postal, numero_exterior, numero_interior, colonia, numero, email, pagina_web)
+            guardar_contacto(mi_agenda, nuevo_contacto)
+
         elif opcion == "2":
             mostrar_agenda(mi_agenda)
+
         elif opcion == "3":
             nombre = input("Ingrese el nombre a buscar: ")
-            contacto_encontrado = buscar_contacto_por_nombre(mi_agenda, nombre)
+            contacto_encontrado = mi_agenda.buscar_contacto_por_nombre(nombre)
             if contacto_encontrado:
-                print("Contacto encontrado:")
-                print(f"Nombre: {contacto_encontrado.get_nombre()}")
-                print(f"Calle: {contacto_encontrado.get_calle()}")
+                mostrar_informacion_contacto(contacto_encontrado)
             else:
                 print("Contacto no encontrado.")
+
         elif opcion == "4":
             numero = input("Ingrese el número de teléfono a buscar: ")
-            contacto_encontrado = buscar_contacto_por_telefono(mi_agenda, numero)
+            contacto_encontrado = mi_agenda.buscar_contacto_por_telefono(numero)
             if contacto_encontrado:
-                print("Contacto encontrado:")
-                print(f"Nombre: {contacto_encontrado.get_nombre()}")
-                print(f"Número de Teléfono: {contacto_encontrado.get_numero()}")
+                mostrar_informacion_contacto(contacto_encontrado)
             else:
-                print("Contacto no encontrado.")
+                print("Contacto no encontrado.")                
         elif opcion == "5":
             nombre = input("Ingrese el nombre del contacto a borrar: ")
-            contacto_a_borrar = buscar_contacto_por_nombre(mi_agenda, nombre)
+            contacto_a_borrar = mi_agenda.buscar_contacto_por_nombre(nombre)
             if contacto_a_borrar:
                 borrar_contacto(mi_agenda, contacto_a_borrar)
             else:
                 print("Contacto no encontrado.")
+
         elif opcion == "6":
+            print("Enviar una invitación para compartir tu agenda.")
+            agenda_id = input("ID de la agenda a compartir: ")
+            receptor_email = input("Email del usuario con quien compartir: ")
+            nivel_de_acceso = input("Nivel de acceso (lectura/escritura): ")
+            enviar_invitacion(agenda_id, current_user.user_id, receptor_email, nivel_de_acceso)
+
+        elif opcion == "7":
+            print("Responder a invitaciones pendientes.")
+            invitacion_id = input("ID de la invitación a responder: ")
+            respuesta = input("Aceptas la invitación? (s/n): ")
+            if respuesta.lower() == 's':
+                aceptar_invitacion(current_user, invitacion_id)
+            else:
+                print("Invitación declinada o ignorada.")
+
+        elif opcion == "8":
             print("Saliendo...")
             break
+        
+        elif opcion == "9":
+            # Opción para cerrar sesión
+            current_user_id, current_user_email = None, None
+            print("Se ha cerrado la sesión.")
+    
+
         else:
             print("Opción no válida. Intente nuevamente.")
+
+if __name__ == "__main__":
+    main()

@@ -12,6 +12,7 @@ winterIsComingjdfr/
 __pycache__/
 keys.json
 firebase-adminsdk.json
+.gitignore
 
 # Carpetas que contiene archivos de estado de tu editor/IDE
 .vscode/
