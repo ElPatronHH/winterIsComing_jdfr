@@ -1,14 +1,9 @@
-#main.py
+#main.py jdfr
 from firestore_db import Agenda, Contacto
 from users import enviar_invitacion, aceptar_invitacion, Usuario, login_user
 
 current_user = Usuario(user_id='id_del_usuario_actual', email='email_del_usuario_actual')
 
-# Esta función ya no es necesaria porque no leeremos contactos de un archivo de texto.
-# def cargar_contactos(agenda):
-#     ...
-
-# Reemplazamos la función 'guardar_contacto' para que guarde en Firestore
 def guardar_contacto(agenda, contacto):
     try:
         agenda.agregar_contacto(contacto)
@@ -48,16 +43,12 @@ def mostrar_informacion_contacto(contacto):
 
 
 # def buscar_contacto_por_nombre(agenda, nombre):
-#     # Esta función se puede mejorar usando las consultas de Firestore directamente
-#     # Pero por ahora, la mantendremos simple y haremos la búsqueda en la lista cargada
 #     for contacto in agenda.obtener_contactos():
 #         if contacto.nombre.lower() == nombre.lower():
 #             return contacto
 #     return None
 
-# Actualizamos la función 'borrar_contacto' para que trabaje con Firestore
 def borrar_contacto(agenda, contacto):
-    # Necesitaríamos un método en la clase Agenda para manejar esto en Firestore
     agenda.eliminar_contacto(contacto)
     print(f"Contacto '{contacto.nombre}' ha sido borrado.")
 
@@ -70,7 +61,6 @@ def main():
     
     while True:
         if not current_user_id:
-            # El usuario necesita iniciar sesión
             email = input("Por favor ingrese su email: ")
             password = input("Por favor ingrese su contraseña: ")
             current_user_id, current_user_email = login_user(email, password)
@@ -96,7 +86,7 @@ def main():
         if opcion == "1":
             print("Ingrese los datos del nuevo contacto:")
             nombre = input("Nombre: ")
-            edad = int(input("Edad: "))  # Asegúrate de convertir la entrada a int
+            edad = int(input("Edad: ")) 
             calle = input("Calle: ")
             ciudad = input("Ciudad: ")
             codigo_postal = input("Código Postal: ")
@@ -157,7 +147,6 @@ def main():
             break
         
         elif opcion == "9":
-            # Opción para cerrar sesión
             current_user_id, current_user_email = None, None
             print("Se ha cerrado la sesión.")
     

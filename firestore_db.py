@@ -1,21 +1,19 @@
-#firestore_db.py
+#firestore_db.py jdfr
 import firebase_admin
 from firebase_admin import credentials, firestore
 import warnings
 
 
-# Inicializa Firebase Admin
 cred = credentials.Certificate("keys.json")
 firebase_admin.initialize_app(cred)
 
-# Referencia al cliente de Firestore
 db = firestore.client()
 
 class Usuario:
     def __init__(self, user_id, email):
         self.user_id = user_id
         self.email = email
-        self.agendas_compartidas = []  # IDs de agendas a las que tienen acceso
+        self.agendas_compartidas = [] 
 
     def to_dict(self):
         return {
@@ -65,25 +63,21 @@ class Contacto(Persona, Direccion, Telefono, CorreoElectronico):
         Direccion.__init__(self, calle, ciudad, codigo_postal, numero_exterior, numero_interior, colonia)
         Telefono.__init__(self, numero)
         CorreoElectronico.__init__(self, email, pagina_web)
-        self.doc_id = doc_id  # Agregar un atributo para almacenar el ID del documento
-
+        self.doc_id = doc_id  
+        
     def to_dict(self):
-        # Aquí combinamos todos los atributos de las clases heredadas en un solo diccionario
         data = {}
         for base_class in self.__class__.__bases__:
             data.update(base_class.to_dict(self))
         return data
 
     def merge(self, otro_contacto):
-        # Suponiendo que 'timestamp' es un atributo de instancia de Contacto
         if otro_contacto.timestamp > self.timestamp:
-            # Fusiona cada atributo, eligiendo el más reciente
             for attr, value in vars(otro_contacto).items():
                 setattr(self, attr, value)
 
     @staticmethod
     def from_dict(source):
-        # Aquí creamos una instancia de Contacto a partir de un diccionario
         contacto = Contacto(
             nombre=source['nombre'],
             edad=source['edad'],
@@ -107,19 +101,15 @@ class Agenda:
         self.lista_de_contactos = []
 
     def agregar_contacto(self, contacto):
-        # Agrega el contacto a la lista local y a Firestore
         self.lista_de_contactos.append(contacto)
         if contacto.doc_id is None:
-            # Si es un nuevo contacto, crea un nuevo documento
             new_doc_ref = db.collection('contactos').document()
             new_doc_ref.set(contacto.to_dict())
-            contacto.doc_id = new_doc_ref.id  # Almacena el ID del documento creado
+            contacto.doc_id = new_doc_ref.id 
         else:
-            # Si el contacto ya tiene un ID, actualiza el documento existente
             db.collection('contactos').document(contacto.doc_id).set(contacto.to_dict())
 
     def cargar_contactos(self):
-        # Carga los contactos de Firestore
         self.lista_de_contactos = []
         contactos_ref = db.collection('contactos')
         docs = contactos_ref.stream()
@@ -128,7 +118,6 @@ class Agenda:
             self.lista_de_contactos.append(contacto)
 
     def obtener_contactos(self):
-        # Retorna la lista local de contactos
         return self.lista_de_contactos
 
     def eliminar_contacto(self, contacto):
@@ -146,7 +135,6 @@ class Agenda:
         warnings.filterwarnings("ignore", category=UserWarning, module='google.cloud.firestore')
         try:
             contactos_ref = db.collection('contactos')
-            # Actualización para usar argumentos con nombre
             query = contactos_ref.where('nombre', '==', nombre).limit(1)
             results = query.stream()
             for result in results:
@@ -157,12 +145,10 @@ class Agenda:
             return None
         
     def merge_contactos(self, otro_contacto):
-        # Encuentra un contacto existente que coincida con otro_contacto
         for contacto in self.lista_de_contactos:
             if contacto.nombre == otro_contacto.nombre and contacto.numero == otro_contacto.numero:
                 contacto.merge(otro_contacto)
                 return contacto
-        # Si no se encuentra un contacto coincidente, simplemente agrega otro_contacto
         self.agregar_contacto(otro_contacto)
         return otro_contacto
     

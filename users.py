@@ -77,8 +77,6 @@ def aceptar_invitacion(usuario, invitacion_id):
 #         print(f"Error de valor: {e}")
 #         return None, None
 
-
-
 def login_user(email, password):
     api_key = 'AIzaSyAfbXWM4PF78u7JkdfXpoBSjy3jKbXEErc'
     url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={api_key}"
