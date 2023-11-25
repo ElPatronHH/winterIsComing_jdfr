@@ -2,6 +2,7 @@
 #main.py jdfr
 from firestore_db import Agenda, Contacto
 from users import enviar_invitacion, aceptar_invitacion, Usuario, login_user
+from google.cloud import firestore
 
 current_user = Usuario(user_id='id_del_usuario_actual', email='email_del_usuario_actual')
 
@@ -75,7 +76,8 @@ def main():
         print("3. Buscar contacto por nombre")
         print("4. Buscar contacto por teléfono")
         print("5. Borrar contacto")
-        print("6. Compartir mi agenda")
+        #print("6. Compartir mi agenda")
+        print("6. Ver agendas de usuarios disponibles.")
         print("7. Responder a una invitación")
         print("8. Salir")
         print("")
@@ -126,11 +128,13 @@ def main():
                 print("Contacto no encontrado.")
 
         elif opcion == "6":
-            print("Enviar una invitación para compartir tu agenda.")
+            """print("Enviar una invitación para compartir tu agenda.")
             agenda_id = input("ID de la agenda a compartir: ")
             receptor_email = input("Email del usuario con quien compartir: ")
             nivel_de_acceso = input("Nivel de acceso (lectura/escritura): ")
-            enviar_invitacion(agenda_id, current_user.user_id, receptor_email, nivel_de_acceso)
+            enviar_invitacion(agenda_id, current_user.user_id, receptor_email, nivel_de_acceso)"""
+            print("Estas son las agendas disponibles: ")
+            current_user.visualizar_agendas_disponibles()
 
         elif opcion == "7":
             print("Responder a invitaciones pendientes.")

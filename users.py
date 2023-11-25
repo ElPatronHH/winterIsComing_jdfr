@@ -44,7 +44,13 @@ class Usuario:
             }
             coleccion.add(campos_documento)
             coleccion.add(settings)
-        
+
+    def visualizar_agendas_disponibles():
+        colecciones = [coleccion.id for coleccion in db.collections()]
+        print('Colecciones en la base de datos:')
+        for nombre_coleccion in colecciones:
+            print(nombre_coleccion)
+
 def register_user(email, password):
     user = auth.create_user(
         email=email,
