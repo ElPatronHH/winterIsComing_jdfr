@@ -1,3 +1,4 @@
+
 #firestore_db.py jdfr
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -9,7 +10,7 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-class Usuario:
+"""class Usuario:
     def __init__(self, user_id, email):
         self.user_id = user_id
         self.email = email
@@ -20,7 +21,7 @@ class Usuario:
             'user_id': self.user_id,
             'email': self.email,
             'agendas_compartidas': self.agendas_compartidas,
-        }
+        }"""
 
 class Direccion:
     def __init__(self, calle, ciudad, codigo_postal, numero_exterior, numero_interior, colonia):
@@ -100,18 +101,18 @@ class Agenda:
         self.usuarios_con_acceso = {}  
         self.lista_de_contactos = []
 
-    def agregar_contacto(self, contacto):
+    def agregar_contacto(self, contacto, current_user_email):
         self.lista_de_contactos.append(contacto)
         if contacto.doc_id is None:
-            new_doc_ref = db.collection('contactos').document()
+            new_doc_ref = db.collection(current_user_email).document()
             new_doc_ref.set(contacto.to_dict())
             contacto.doc_id = new_doc_ref.id 
         else:
-            db.collection('contactos').document(contacto.doc_id).set(contacto.to_dict())
+            db.collection(current_user_email).document(contacto.doc_id).set(contacto.to_dict())
 
-    def cargar_contactos(self):
+    def cargar_contactos(self, current_user_email):
         self.lista_de_contactos = []
-        contactos_ref = db.collection('contactos')
+        contactos_ref = db.collection(current_user_email)
         docs = contactos_ref.stream()
         for doc in docs:
             contacto = Contacto.from_dict(doc.to_dict())
@@ -120,9 +121,9 @@ class Agenda:
     def obtener_contactos(self):
         return self.lista_de_contactos
 
-    def eliminar_contacto(self, contacto):
+    def eliminar_contacto(self, contacto, current_user_email):
         if contacto.doc_id:
-            db.collection('contactos').document(contacto.doc_id).delete()
+            db.collection(current_user_email).document(contacto.doc_id).delete()
             self.lista_de_contactos.remove(contacto)
 
     def buscar_contacto_por_telefono(self, numero):
@@ -131,10 +132,10 @@ class Agenda:
                 return contacto
         return None
 
-    def buscar_contacto_por_nombre(self, nombre):
+    def buscar_contacto_por_nombre(self, nombre, current_user_email):
         warnings.filterwarnings("ignore", category=UserWarning, module='google.cloud.firestore')
         try:
-            contactos_ref = db.collection('contactos')
+            contactos_ref = db.collection(current_user_email)
             query = contactos_ref.where('nombre', '==', nombre).limit(1)
             results = query.stream()
             for result in results:

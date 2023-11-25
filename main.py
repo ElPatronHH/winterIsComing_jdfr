@@ -1,13 +1,14 @@
+
 #main.py jdfr
 from firestore_db import Agenda, Contacto
 from users import enviar_invitacion, aceptar_invitacion, Usuario, login_user
 
 current_user = Usuario(user_id='id_del_usuario_actual', email='email_del_usuario_actual')
 
-def guardar_contacto(agenda, contacto):
+def guardar_contacto(agenda, contacto, current_user_email):
     try:
-        agenda.agregar_contacto(contacto)
-        print(f"Contacto '{contacto.nombre}' guardado exitosamente.")
+        agenda.agregar_contacto(contacto, current_user_email)
+        print(f"Contacto '{contacto.nombre}' guardado exitosamente en ", current_user_email,".")
     except Exception as e:
         print(f"Ocurrió un error al guardar el contacto: {e}")
 
@@ -48,17 +49,15 @@ def mostrar_informacion_contacto(contacto):
 #             return contacto
 #     return None
 
-def borrar_contacto(agenda, contacto):
-    agenda.eliminar_contacto(contacto)
+def borrar_contacto(agenda, contacto, current_user_email):
+    agenda.eliminar_contacto(contacto, current_user_email)
     print(f"Contacto '{contacto.nombre}' ha sido borrado.")
 
 def main():
     current_user_id, current_user_email = None, None
     mi_agenda = Agenda(owner_id=current_user_id)
-    mi_agenda.cargar_contactos()
     current_user_id, current_user_email = None, None
 
-    
     while True:
         if not current_user_id:
             email = input("Por favor ingrese su email: ")
@@ -66,6 +65,7 @@ def main():
             current_user_id, current_user_email = login_user(email, password)
             if current_user_id:
                 print(f"Bienvenido {current_user_email}")
+                current_user.cargar_agenda(current_user_email)
             else:
                 print("Inicio de sesión fallido, intente de nuevo.")
                 continue
@@ -96,16 +96,15 @@ def main():
             numero = input("Número de Teléfono: ")
             email = input("Correo Electrónico: ")
             pagina_web = input("Página Web: ")
-
             nuevo_contacto = Contacto(nombre, edad, calle, ciudad, codigo_postal, numero_exterior, numero_interior, colonia, numero, email, pagina_web)
-            guardar_contacto(mi_agenda, nuevo_contacto)
+            guardar_contacto(mi_agenda, nuevo_contacto, current_user_email)
 
         elif opcion == "2":
             mostrar_agenda(mi_agenda)
 
         elif opcion == "3":
             nombre = input("Ingrese el nombre a buscar: ")
-            contacto_encontrado = mi_agenda.buscar_contacto_por_nombre(nombre)
+            contacto_encontrado = mi_agenda.buscar_contacto_por_nombre(nombre, current_user_email)
             if contacto_encontrado:
                 mostrar_informacion_contacto(contacto_encontrado)
             else:
@@ -120,9 +119,9 @@ def main():
                 print("Contacto no encontrado.")                
         elif opcion == "5":
             nombre = input("Ingrese el nombre del contacto a borrar: ")
-            contacto_a_borrar = mi_agenda.buscar_contacto_por_nombre(nombre)
+            contacto_a_borrar = mi_agenda.buscar_contacto_por_nombre(nombre, current_user_email)
             if contacto_a_borrar:
-                borrar_contacto(mi_agenda, contacto_a_borrar)
+                borrar_contacto(mi_agenda, contacto_a_borrar, current_user_email)
             else:
                 print("Contacto no encontrado.")
 

@@ -1,3 +1,4 @@
+
 #users.py jdfr
 from firebase_admin import auth, firestore, exceptions
 from firestore_db import db 
@@ -16,7 +17,34 @@ class Usuario:
             'email': self.email,
             'agendas_compartidas': self.agendas_compartidas,
         }
-
+        
+    def cargar_agenda(self, email):
+        print("Esto entra y sirve.")
+        coleccion = db.collection(email);
+        documentos = coleccion.limit(1).get()
+        if documentos:
+            print(f'La agenda de "{email}" ya existe.')
+        else:
+            print(f'La agenda de "{email}" no existe, se creará.')
+            campos_documento = {
+            'nombre': '',
+            'edad': '',
+            'calle': '',
+            'ciudad': '',
+            'codigo_postal': '',
+            'numero_exterior': '',
+            'numero_interior': '',
+            'colonia': '',
+            'numero': '',
+            'email': '',
+            'pagina_web': ''
+            }
+            settings = {
+                'escritura':'0'
+            }
+            coleccion.add(campos_documento)
+            coleccion.add(settings)
+        
 def register_user(email, password):
     user = auth.create_user(
         email=email,
